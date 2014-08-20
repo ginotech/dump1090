@@ -266,11 +266,12 @@ struct {                             // Internal state
     uint16_t       *maglut;          // I/Q -> Magnitude lookup table
     int             exit;            // Exit from the main loop when true
 
-    // RTLSDR
+    // Device
     int           dev_index;
     int           gain;
     int           enable_agc;
     rtlsdr_dev_t *dev;
+    bladerf      *dev_bladerf;
     int           freq;
     int           ppm_error;
 
