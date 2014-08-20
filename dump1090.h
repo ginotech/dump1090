@@ -185,6 +185,12 @@
 
 #define MODES_NOTUSED(V) ((void) V)
 
+// ============================== enums ===================================
+typedef enum {
+    RTLSDR,
+    BLADERF
+} hw_t;
+
 //======================== structure declarations =========================
 
 // Structure used to describe a networking client
@@ -286,6 +292,7 @@ struct {                             // Internal state
 #endif
 
     // Configuration
+    hw_t  hw_device;                 // Hardware device type
     char *filename;                  // Input form file, --ifile option
     int   phase_enhance;             // Enable phase enhancement if true
     int   nfix_crc;                  // Number of crc bit error(s) to correct
