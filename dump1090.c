@@ -256,9 +256,9 @@ void modesInitBladeRF(void) {
     }
 
     fprintf(stderr, "Found %d device(s):\n", device_count);
-    for (j = 0 j < device_count; j++) {
+    for (j = 0; j < device_count; j++) {
         fprintf(stderr, "%d: %s\n\tserial: %s\n\tbus, addr: %d, %d\n", j, (j == Modes.dev_index) ?
-            "(currently selected)" : "", devices.serial, devices.usb_bus, devices.usb_addr);
+            "(currently selected)" : "", (*devices)->serial, (*devices)->usb_bus, (*devices)->usb_addr);
     }
     // Open the first bladeRF found (TODO: allow user to choose)
     int result = bladerf_open(&Modes.dev_bladerf, NULL);
@@ -274,10 +274,8 @@ void modesInitBladeRF(void) {
     // TODO: use bladerf_set_gain to autocompute the above values
     bladerf_select_band(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
     bladerf_set_frequency(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
-    bladerf_set_sample_rate(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, MODES_DEFAULT_RATE, 
-        NULL);
-    bladerf_set_bandwidth(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN,
-        NULL);
+    bladerf_set_sample_rate(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, MODES_DEFAULT_RATE, NULL);
+    bladerf_set_bandwidth(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN, NULL);
     bladerf_enable_module(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, true);    
 }
 
