@@ -242,6 +242,46 @@ void modesInitRTLSDR(void) {
         rtlsdr_get_tuner_gain(Modes.dev)/10.0);
 }
 //
+// ============================== bladeRF =================================
+//
+void modesInitBladeRF(void) {
+    int j;
+    int device_count;
+    struct bladerf_devinfo **devices;
+
+    device_count = bladerf_get_device_list(devices);
+    if (!device_count) {
+        fprintf(stderr, "No supported bladeRF devices found.\n");
+        exit(1);
+    }
+
+    fprintf(stderr, "Found %d device(s):\n", device_count);
+    for (j = 0 j < device_count; j++) {
+        fprintf(stderr, "%d: %s\n\tserial: %s\n\tbus, addr: %d, %d\n", j, (j == Modes.dev_index) ?
+            "(currently selected)" : "", devices.serial, devices.usb_bus, devices.usb_addr);
+    }
+    // Open the first bladeRF found (TODO: allow user to choose)
+    int result = bladerf_open(&Modes.dev_bladerf, NULL);
+    if (result < 0) {
+        fprintf(stderr, "Error opening the bladeRF device: %d\n", result);
+        exit(1);
+    }
+
+    // Set gain, frequency, sample rate
+    bladerf_set_lna_gain(Modes.dev_bladerf, bladerf_lna_gain.BLADERF_LNA_GAIN_MAX);
+    bladerf_set_rxvga1(Modes.dev_bladerf, BLADERF_RXVGA1_GAIN_MAX);
+    bladerf_set_rxvga2(Modes.dev_bladerf, 3);
+    // TODO: use bladerf_set_gain to autocompute the above values
+    bladerf_select_band(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
+    bladerf_set_frequency(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
+    bladerf_set_sample_rate(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, MODES_DEFAULT_RATE, 
+        NULL);
+    bladerf_set_bandwidth(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN,
+        NULL);
+    bladerf_enable_module(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, true);    
+}
+
+//
 //=========================================================================
 //
 // We use a thread reading data in background, while the main thread
