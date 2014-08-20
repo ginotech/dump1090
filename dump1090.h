@@ -185,11 +185,13 @@
 
 #define MODES_NOTUSED(V) ((void) V)
 
-// ============================== enums ===================================
+// ============================== typedefs ===================================
 typedef enum {
     RTLSDR,
     BLADERF
 } hw_t;
+
+typedef struct bladerf bladerf_t;
 
 //======================== structure declarations =========================
 
@@ -271,7 +273,7 @@ struct {                             // Internal state
     int           gain;
     int           enable_agc;
     rtlsdr_dev_t *dev;
-    bladerf      *dev_bladerf;
+    bladerf_t    *dev_bladerf;
     int           freq;
     int           ppm_error;
 
