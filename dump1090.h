@@ -58,6 +58,7 @@
     #include <sys/stat.h>
     #include <sys/ioctl.h>
     #include "rtl-sdr.h"
+    #include "libbladeRF.h"
     #include "anet.h"
 #else
     #include "winstubs.h" //Put everything Windows specific in here
