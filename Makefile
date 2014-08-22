@@ -11,7 +11,7 @@ EXTRACFLAGS=-DHTMLPATH=\"$(SHAREDIR)\"
 endif
 
 CFLAGS=-O2 -g -Wall -W `pkg-config --cflags librtlsdr libbladeRF`
-LIBS=`pkg-config --libs librtlsdr` -lpthread -lm
+LIBS=`pkg-config --libs librtlsdr libbladeRF` -lpthread -lm
 CC=gcc
 
 
