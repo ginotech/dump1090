@@ -268,15 +268,15 @@ void modesInitBladeRF(void) {
     }
 
     // Set gain, frequency, sample rate
-    bladerf_set_lna_gain(Modes.dev_bladerf, bladerf_lna_gain.BLADERF_LNA_GAIN_MAX);
+    bladerf_set_lna_gain(Modes.dev_bladerf, BLADERF_LNA_GAIN_MAX);
     bladerf_set_rxvga1(Modes.dev_bladerf, BLADERF_RXVGA1_GAIN_MAX);
     bladerf_set_rxvga2(Modes.dev_bladerf, 3);
     // TODO: use bladerf_set_gain to autocompute the above values
-    bladerf_select_band(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
-    bladerf_set_frequency(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, Modes.freq);
-    bladerf_set_sample_rate(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, MODES_DEFAULT_RATE, NULL);
-    bladerf_set_bandwidth(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN, NULL);
-    bladerf_enable_module(Modes.dev_bladerf, bladerf_module.BLADERF_MODULE_RX, true);    
+    bladerf_select_band(Modes.dev_bladerf, BLADERF_MODULE_RX, Modes.freq);
+    bladerf_set_frequency(Modes.dev_bladerf, BLADERF_MODULE_RX, Modes.freq);
+    bladerf_set_sample_rate(Modes.dev_bladerf, BLADERF_MODULE_RX, MODES_DEFAULT_RATE, NULL);
+    bladerf_set_bandwidth(Modes.dev_bladerf, BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN, NULL);
+    bladerf_enable_module(Modes.dev_bladerf, BLADERF_MODULE_RX, true);    
 }
 
 //
