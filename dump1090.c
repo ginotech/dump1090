@@ -66,6 +66,7 @@ void modesInitConfig(void) {
     memset(&Modes, 0, sizeof(Modes));
 
     // Now initialise things that should not be 0/NULL to their defaults
+    Modes.hw_device               = RTLSDR;
     Modes.gain                    = MODES_MAX_GAIN;
     Modes.freq                    = MODES_DEFAULT_FREQ;
     Modes.ppm_error               = MODES_DEFAULT_PPM;
@@ -618,6 +619,8 @@ int main(int argc, char **argv) {
 
         if (!strcmp(argv[j],"--device-index") && more) {
             Modes.dev_index = verbose_device_search(argv[++j]);
+        } else if (!strcmp(argv[j],"--bladerf")) {
+            Modes.hw_device = BLADERF;
         } else if (!strcmp(argv[j],"--gain") && more) {
             Modes.gain = (int) atof(argv[++j])*10; // Gain is in tens of DBs
         } else if (!strcmp(argv[j],"--enable-agc")) {
