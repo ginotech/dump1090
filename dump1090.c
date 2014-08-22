@@ -251,7 +251,7 @@ void modesInitBladeRF(void) {
     struct bladerf_devinfo **devices = NULL;
 
     device_count = bladerf_get_device_list(devices);
-    if (!device_count) {
+    if (device_count < 1) {
         fprintf(stderr, "No supported bladeRF devices found.\n");
         exit(1);
     }
@@ -747,7 +747,11 @@ int main(int argc, char **argv) {
     if (Modes.net_only) {
         fprintf(stderr,"Net-only mode, no RTL device or file open.\n");
     } else if (Modes.filename == NULL) {
-        modesInitRTLSDR();
+        if (Modes.hw_device == RTLSDR) {
+            modesInitRTLSDR();
+        } else if (Modes.hw_device == BLADERF) {
+            modesInitBladeRF();
+        }
     } else {
         if (Modes.filename[0] == '-' && Modes.filename[1] == '\0') {
             Modes.fd = STDIN_FILENO;
