@@ -276,9 +276,15 @@ void modesInitBladeRF(void) {
     // TODO: use bladerf_set_gain to autocompute the above values
     bladerf_select_band(Modes.dev_bladerf, BLADERF_MODULE_RX, Modes.freq);
     bladerf_set_frequency(Modes.dev_bladerf, BLADERF_MODULE_RX, Modes.freq);
-    bladerf_set_sample_rate(Modes.dev_bladerf, BLADERF_MODULE_RX, MODES_DEFAULT_RATE, NULL);
+    result = bladerf_set_sample_rate(Modes.dev_bladerf, BLADERF_MODULE_RX, MODES_DEFAULT_RATE, NULL);
+    if (result) {
+        printf("Error setting sample rate: %d\n", result);
+        if (result == -5) {
+            printf("(Did you remember to load the FPGA?)\n");
+        }
+    }
     bladerf_set_bandwidth(Modes.dev_bladerf, BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN, NULL);
-    bladerf_enable_module(Modes.dev_bladerf, BLADERF_MODULE_RX, true);    
+    bladerf_enable_module(Modes.dev_bladerf, BLADERF_MODULE_RX, true);
 }
 
 //
