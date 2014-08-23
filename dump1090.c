@@ -247,7 +247,7 @@ void modesInitRTLSDR(void) {
 void modesInitBladeRF(void) {
     int j;
     int device_count;
-    struct bladerf_devinfo **devices;
+    struct bladerf_devinfo **devices = NULL;
 
     device_count = bladerf_get_device_list(devices);
     if (!device_count) {
