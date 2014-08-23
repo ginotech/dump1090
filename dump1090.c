@@ -248,9 +248,9 @@ void modesInitRTLSDR(void) {
 void modesInitBladeRF(void) {
     int j;
     int device_count;
-    struct bladerf_devinfo **devices = NULL;
+    struct bladerf_devinfo *devices = NULL;
 
-    device_count = bladerf_get_device_list(devices);
+    device_count = bladerf_get_device_list(&devices);
     if (device_count < 1) {
         fprintf(stderr, "No supported bladeRF devices found.\n");
         exit(1);
@@ -259,7 +259,8 @@ void modesInitBladeRF(void) {
     fprintf(stderr, "Found %d device(s):\n", device_count);
     for (j = 0; j < device_count; j++) {
         fprintf(stderr, "%d: %s\n\tserial: %s\n\tbus, addr: %d, %d\n", j, (j == Modes.dev_index) ?
-            "(currently selected)" : "", (*devices)->serial, (*devices)->usb_bus, (*devices)->usb_addr);
+            "(currently selected)" : "", devices->serial, devices->usb_bus, devices->usb_addr);
+        devices++;
     }
     // Open the first bladeRF found (TODO: allow user to choose)
     int result = bladerf_open(&Modes.dev_bladerf, NULL);
