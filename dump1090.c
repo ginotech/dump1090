@@ -282,9 +282,9 @@ void modesInitBladeRF(void) {
         if (result == -5) {
             printf("(Did you remember to load the FPGA?)\n");
         }
+        exit(1);
     }
     bladerf_set_bandwidth(Modes.dev_bladerf, BLADERF_MODULE_RX, BLADERF_BANDWIDTH_MIN, NULL);
-    bladerf_enable_module(Modes.dev_bladerf, BLADERF_MODULE_RX, true);
 }
 
 //
@@ -331,6 +331,40 @@ void rtlsdrCallback(unsigned char *buf, uint32_t len, void *ctx) {
     // Signal to the other thread that new data is ready, and unlock
     pthread_cond_signal(&Modes.data_cond);
     pthread_mutex_unlock(&Modes.data_mutex);
+}
+
+void bladerfCallback(struct bladerf *dev, struct bladerf_stream *stream, struct bladerf_metadata *meta, void *samples, size_t num_samples, void *user_data) {
+    
+    // Lock the data buffer variables before accessing them
+    pthread_mutex_lock(&Modes.data_mutex);
+
+    Modes.iDataIn &= (MODES_ASYNC_BUF_NUMBER-1); // Just incase!!!
+
+    // Get the system time for this block
+    ftime(&Modes.stSystemTimeRTL[Modes.iDataIn]);
+
+    if (num_samples > MODES_ASYNC_BUF_SIZE) {num_samples = MODES_ASYNC_BUF_SIZE;}
+
+    // Queue the new data
+    Modes.pData[Modes.iDataIn] = (uint16_t *) buf;
+    Modes.iDataIn    = (MODES_ASYNC_BUF_NUMBER-1) & (Modes.iDataIn + 1);
+    Modes.iDataReady = (MODES_ASYNC_BUF_NUMBER-1) & (Modes.iDataIn - Modes.iDataOut);   
+
+    if (Modes.iDataReady == 0) {
+      // Ooooops. We've just received the MODES_ASYNC_BUF_NUMBER'th outstanding buffer
+      // This means that RTLSDR is currently overwriting the MODES_ASYNC_BUF_NUMBER+1
+      // buffer, but we havent yet processed it, so we're going to lose it. There
+      // isn't much we can do to recover the lost data, but we can correct things to
+      // avoid any additional problems.
+      Modes.iDataOut   = (MODES_ASYNC_BUF_NUMBER-1) & (Modes.iDataOut+1);
+      Modes.iDataReady = (MODES_ASYNC_BUF_NUMBER-1);   
+      Modes.iDataLost++;
+    }
+ 
+    // Signal to the other thread that new data is ready, and unlock
+    pthread_cond_signal(&Modes.data_cond);
+    pthread_mutex_unlock(&Modes.data_mutex);
+
 }
 //
 //=========================================================================
@@ -397,9 +431,14 @@ void *readerThreadEntryPoint(void *arg) {
     MODES_NOTUSED(arg);
 
     if (Modes.filename == NULL) {
-        rtlsdr_read_async(Modes.dev, rtlsdrCallback, NULL,
+        if (hw_device == RTLSDR) {
+            rtlsdr_read_async(Modes.dev, rtlsdrCallback, NULL,
                               MODES_ASYNC_BUF_NUMBER,
                               MODES_ASYNC_BUF_SIZE);
+        } else if (hw_device == BLADERF) {
+            // TODO: Set up and start async RX from bladeRF here - oy vey!
+            bladerf_enable_module(Modes.dev_bladerf, BLADERF_MODULE_RX, true);
+        }
     } else {
         readDataFromFile();
     }
